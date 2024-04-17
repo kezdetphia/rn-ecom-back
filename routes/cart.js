@@ -7,11 +7,13 @@ const {
   decrementCartItem,
 } = require("../controllers/CartController");
 
+const { verifyToken } = require("../middleware/verifyToken");
+
 // Get the user's shopping cart
-router.get("/find/:id", getCart);
+router.get("/find", getCart);
 
 // Add an item to the user's shopping cart
-router.post("/", addToCart); // Add item to cart
+router.post("/", verifyToken, addToCart); // Add item to cart
 
 // Delete an item from the user's shopping cart
 router.delete("/:cartItemId", deleteCartItem);

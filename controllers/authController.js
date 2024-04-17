@@ -27,7 +27,12 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
-    !user && res.status(401).json("Wrong credentials! -LOGINUSER API");
+
+    if (!user) {
+      return res
+        .status(401)
+        .json("Wrong credentials provide a valid email! -LOGINUSER API");
+    }
 
     const decryptedPassword = CryptoJs.AES.decrypt(
       user.password,
@@ -35,8 +40,11 @@ const loginUser = async (req, res) => {
     );
     const decryptedPass = decryptedPassword.toString(CryptoJs.enc.Utf8);
 
-    decryptedPass !== req.body.password &&
-      res.status(401).json("Wrong password! -LOGINUSER API");
+    if (decryptedPass !== req.body.password) {
+      return res
+        .status(401)
+        .json("Wrong credentials provide a valid password! -LOGINUSER API");
+    }
 
     const userToken = jwt.sign(
       {

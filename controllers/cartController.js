@@ -2,9 +2,13 @@ const Product = require("../models/Product");
 const Cart = require("../models/Cart");
 
 const addToCart = async (req, res) => {
-  const { userId, cartItem, quantity } = req.body;
+  const userId = req.user.id; //middelware token
+
+  console.log("CartControllerUserId", userId);
+
+  const { cartItem, quantity } = req.body;
   try {
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId: userId });
 
     if (cart) {
       const existingProduct = cart.products.find(
@@ -36,16 +40,12 @@ const addToCart = async (req, res) => {
 };
 
 const getCart = async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.user.id; //middleware token
   try {
-    const cart = await Cart.find({ userId }).populate(
+    const cart = await Cart.find({ userId: userId }).populate(
       "products.cartItem",
       "_id title supplier price imageUrl"
     );
-
-    if (!cart) {
-      return res.status(400).json("Cart is empty");
-    }
 
     res.status(200).json(cart);
   } catch (error) {
