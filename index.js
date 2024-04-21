@@ -23,6 +23,6 @@ app.use("/api/products", productRouter);
 app.use("/api", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
-app.use('/api/orders', orderRouter);
+app.use("/api/orders", orderRouter);
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));

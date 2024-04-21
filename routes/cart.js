@@ -10,13 +10,14 @@ const {
 const { verifyToken } = require("../middleware/verifyToken");
 
 // Get the user's shopping cart
-router.get("/find", getCart);
+router.get("/find", verifyToken, getCart);
 
 // Add an item to the user's shopping cart
 router.post("/", verifyToken, addToCart); // Add item to cart
 
 // Delete an item from the user's shopping cart
-router.delete("/:cartItemId", deleteCartItem);
+// router.delete("/:cartItemId", deleteCartItem);
+router.delete("/:cartItem", deleteCartItem);
 
 // Decrement an item from the user's shopping cart
 router.post("/quantity", decrementCartItem);

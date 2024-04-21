@@ -3,8 +3,8 @@ const Cart = require("../models/Cart");
 
 const addToCart = async (req, res) => {
   const userId = req.user.id; //middelware token
-
-  console.log("CartControllerUserId", userId);
+  console.log("addToCart req.user.id: ", req.user.id);
+  console.log("addToCart req.body: ", req.body);
 
   const { cartItem, quantity } = req.body;
   try {
@@ -40,13 +40,13 @@ const addToCart = async (req, res) => {
 };
 
 const getCart = async (req, res) => {
-  const { userId } = req.user.id; //middleware token
+  const userId = req.user.id; //middleware token
+
   try {
     const cart = await Cart.find({ userId: userId }).populate(
       "products.cartItem",
       "_id title supplier price imageUrl"
     );
-
     res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ getCartError: error });
@@ -54,24 +54,24 @@ const getCart = async (req, res) => {
 };
 
 const deleteCartItem = async (req, res) => {
-  const cartItemId = req.params.cartItemId;
+  const cartItemId = req.params.cartItem;
+
   try {
     const updatedCart = await Cart.findOneAndUpdate(
       { "products._id": cartItemId },
       { $pull: { products: { _id: cartItemId } } },
-      { new: true } //return the updated document instead of the original one
+      { new: true }
     );
 
     if (!updatedCart) {
-      return res.status(404).json("Cart item not found");
+      return res.status(404).json({ message: "Cart item not found" });
     }
 
     res.status(200).json(updatedCart);
-  } catch (err) {
-    res.status(500).json({ addToCartError: err });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete cart item" });
   }
 };
-// 661c673ec12ed92f8a5877b8 661c51a33c70d24238c5beb9
 
 const decrementCartItem = async (req, res) => {
   const { userId, cartItem } = req.body;
