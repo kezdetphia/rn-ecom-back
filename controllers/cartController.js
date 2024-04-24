@@ -3,8 +3,6 @@ const Cart = require("../models/Cart");
 
 const addToCart = async (req, res) => {
   const userId = req.user.id; //middelware token
-  console.log("addToCart req.user.id: ", req.user.id);
-  console.log("addToCart req.body: ", req.body);
 
   const { cartItem, quantity } = req.body;
   try {
@@ -73,6 +71,35 @@ const deleteCartItem = async (req, res) => {
   }
 };
 
+const updateCartItem = async (req, res) => {
+  const userId = req.user.id;
+  const { cartItemId, quantity } = req.body;
+
+  try {
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(404).json("Cart not found");
+    }
+
+    const existingProduct = cart.products.find(
+      (product) => product.cartItem.toString() === cartItemId
+    );
+
+    if (!existingProduct) {
+      return res.status(404).json("Product not found");
+    }
+
+    existingProduct.quantity = quantity;
+
+    await cart.save();
+
+    res.status(200).json("Product updated in cart");
+  } catch (err) {
+    res.status(500).json({ updateCartItemError: err });
+  }
+};
+
 const decrementCartItem = async (req, res) => {
   const { userId, cartItem } = req.body;
 
@@ -111,4 +138,10 @@ const decrementCartItem = async (req, res) => {
   }
 };
 
-module.exports = { addToCart, getCart, deleteCartItem, decrementCartItem };
+module.exports = {
+  addToCart,
+  getCart,
+  deleteCartItem,
+  decrementCartItem,
+  updateCartItem,
+};
